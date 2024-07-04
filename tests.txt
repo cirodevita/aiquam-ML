@@ -1,0 +1,45 @@
+# DLINEAR
+
+python main.py --is_training 1 --model DLinear --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.01
+python main.py --is_training 0 --model DLinear --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.01 --convert 1
+
+# CNN
+
+python main.py --is_training 1 --model CNN --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --dropout 0.4 --learning_rate=0.001 --patience 10
+python main.py --is_training 0 --model CNN --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --dropout 0.4 --learning_rate=0.001 --patience 10 --convert 1
+
+# KNN
+
+python main.py --is_training 1 --model KNN --data UEA --root_path ./dataset/AIQUAM/
+python main.py --is_training 0 --model KNN --data UEA --root_path ./dataset/AIQUAM/ --convert 1
+
+# INFORMER
+
+python main.py --is_training 1 --model Informer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128
+python main.py --is_training 0 --model Informer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128 --convert 1
+
+# REFORMER
+
+python main.py --is_training 1 --model Reformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128
+python main.py --is_training 0 --model Reformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128 --convert 1
+
+# TRANSFORMER
+
+python main.py --is_training 0 --model Transformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128
+python main.py --is_training 1 --model Transformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128 --convert 1
+
+
+# TIMESNET
+
+python main.py --is_training 1 --model TimesNet --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128
+python main.py --is_training 0 --model TimesNet --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --d_ff 128 --convert 1
+
+
+
+
+
+
+# NONSTATIONARY_TRANSFORMER
+
+python main.py --is_training 1 --model Nonstationary_Transformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128
+python main.py --is_training 0 --model Nonstationary_Transformer --data UEA --root_path ./dataset/AIQUAM/ --itr 1 --train_epochs 100 --batch_size 16 --patience 10 --learning_rate 0.001 --e_layers 3 --top_k 3 --d_model 128 --convert 1
