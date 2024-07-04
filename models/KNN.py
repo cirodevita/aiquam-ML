@@ -7,7 +7,8 @@ from scipy.stats import mode
 from clang.cindex import xrange
 from numpy import shape
 from sklearn.neighbors import KNeighborsClassifier
-from skl2onnx import to_onnx
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 
 
 class Model(nn.Module):
@@ -18,9 +19,9 @@ class Model(nn.Module):
         self.y = None
 
     def fit(self, x, y):
-        self.x = x
-        self.y = y
-        self.knn.fit(x, y)
+        self.x = x.astype(np.float32)
+        self.y = y.astype(np.float32)
+        self.knn.fit(self.x, self.y)
 
     def evaluate(self, x, y):
         y_pred = self.knn.predict(x)
@@ -28,7 +29,10 @@ class Model(nn.Module):
         return accuracy
     
     def save_model(self, path):
-        onx = to_onnx(self.knn, self.x[:1])
+        initial_type = [('input', FloatTensorType([None, self.x.shape[1]]))]
+        onx = convert_sklearn(self.knn, initial_types=initial_type) 
+
+        # onx = to_onnx(self.knn, self.x[:1])
         with open(f"{path}/model.onnx", "wb") as f:
             f.write(onx.SerializeToString())
 
