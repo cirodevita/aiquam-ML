@@ -1,38 +1,28 @@
 import onnxruntime as ort
 import numpy as np
-# import torch
-# from scipy.stats import mode
-
+import torch
+from scipy.stats import mode
 
 def run_inference(session, input_array):
     input_name = session.get_inputs()[0].name
-    print(input_name)
-    #inputs = {input_name: input_array}
+    inputs = {input_name: input_array}
+    outputs = session.run(None, inputs)
+    return outputs[0]
 
-    # inputs = {"input": input_array}
-
-    # outputs = session.run(None, inputs)
-    # return outputs[0]
-    return 0
-
-
-"""
 def majority_vote(predictions):
     # Trova la classe con il maggior numero di voti
     predictions = np.array(predictions)
     mode_data = mode(predictions, keepdims=False)
     mode_label = mode_data.mode
     return mode_label
-"""
-
 
 model_paths = [
-    #'./checkpoints/AIQUAM_CNN/model.onnx',
-    #'./checkpoints/AIQUAM_DLinear/model.onnx',
-    #'./checkpoints/AIQUAM_Informer/model.onnx',
-    #'./checkpoints/AIQUAM_Reformer/model.onnx',
-    #'./checkpoints/AIQUAM_TimesNet/model.onnx',
-    #'./checkpoints/AIQUAM_Transformer/model.onnx',
+    './checkpoints/AIQUAM_CNN/model.onnx',
+    './checkpoints/AIQUAM_DLinear/model.onnx',
+    # './checkpoints/AIQUAM_Informer/model.onnx',
+    './checkpoints/AIQUAM_Reformer/model.onnx',
+    './checkpoints/AIQUAM_TimesNet/model.onnx',
+    './checkpoints/AIQUAM_Transformer/model.onnx',
     './checkpoints/AIQUAM_KNN/model.onnx'
 ]
 
@@ -43,18 +33,29 @@ model_paths = [
 input_list = [494.79931640625,504.8264465332031,454.9320983886719,397.55279541015625,341.72088623046875,349.1586303710937,348.7724914550781,324.2787780761719,333.1670227050781,362.272216796875,396.6249084472656,430.06976318359375,484.9303894042969,453.0697021484375,477.3464965820313,434.7988586425781,531.5578002929688,344.17449951171875,225.81866455078125,314.5093078613281,322.84539794921875,301.417236328125,309.225830078125,282.3187866210937,268.01959228515625,289.224365234375,312.3394775390625,275.701904296875,247.72433471679688,233.9879608154297,235.0616607666016,181.0559539794922,201.79379272460935,225.74411010742188,247.97442626953125,247.18331909179688,274.9723205566406,280.5320739746094,268.0481262207031,194.05596923828125,224.49575805664065,137.5928955078125,101.20760345458984,231.069580078125,375.4364318847656,407.2272644042969,442.3384094238281,413.7304382324219,393.2890625,433.6060791015625,470.7800903320313,514.7785034179688,556.407470703125,598.1444091796875,575.6135864257812,438.1578979492188,337.7201538085937,336.3081970214844,329.26397705078125,323.6751708984375,329.8407592773437,328.40216064453125,327.1003723144531,270.5162658691406,240.3106689453125,253.34133911132807,212.14730834960935,300.3067626953125,396.8921813964844,463.1541137695313,539.9480590820312,608.8101196289062,591.9304809570312,2.0] # 2
 
 input_array = np.array(input_list, dtype=np.float32)
-input_array = input_array.reshape(1, -1, 1)
 
 predictions = []
 for path in model_paths:
     print(path)
     session = ort.InferenceSession(path)
-    output = run_inference(session, input_array)
-    # output_tensor = torch.tensor(output)
-    # probs = torch.nn.functional.softmax(output_tensor, dim=1)
-    # predicted_class = torch.argmax(probs, dim=1).item()
-    # predictions.append(predicted_class)
 
-# print(predictions)
-# final_pred = majority_vote(predictions)
-# print(final_pred)
+    input_info = session.get_inputs()[0]
+    input_shape = input_info.shape
+
+    if len(input_shape) == 3:
+        input_array = input_array.reshape(1, -1, 1)
+    elif len(input_shape) == 2:
+        input_array = input_array.reshape(1, -1)
+
+    output = run_inference(session, input_array)
+    if 'KNN' in path:
+        predictions.append(output[0])
+    else:
+        output_tensor = torch.tensor(output)
+        probs = torch.nn.functional.softmax(output_tensor, dim=1)
+        predicted_class = torch.argmax(probs, dim=1).item()
+        predictions.append(predicted_class)
+
+print(predictions)
+final_pred = majority_vote(predictions)
+print(final_pred)
