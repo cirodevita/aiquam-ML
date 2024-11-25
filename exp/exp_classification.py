@@ -3,10 +3,25 @@ import numpy as np
 import time
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
+import torch.nn.functional as F
 from torch import optim
 from data_provider.data_factory import data_provider
 from utils.tools import EarlyStopping, adjust_learning_rate, cal_accuracy
 from models import CNN, DLinear, TimesNet, Transformer, Reformer, Informer, Nonstationary_Transformer, KNN
+
+
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=2.0, alpha=0.25):
+        super(FocalLoss, self).__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+
+    def forward(self, inputs, targets):
+        BCE_loss = F.cross_entropy(inputs, targets, reduction='none')
+        pt = torch.exp(-BCE_loss)
+        focal_loss = self.alpha * (1 - pt) ** self.gamma * BCE_loss
+        return focal_loss.mean()
 
 
 class Exp_Classification():
@@ -57,15 +72,16 @@ class Exp_Classification():
     def _select_optimizer(self):
         if self.args.model == 'KNN':
             return None
-        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate, weight_decay=self.args.weight_decay)
         return model_optim
 
     def _select_criterion(self):
         if self.args.model == 'KNN':
             return None
-        criterion = nn.CrossEntropyLoss()
+        # criterion = nn.CrossEntropyLoss()
+        criterion = FocalLoss(gamma=self.args.gamma, alpha=self.args.alpha)
         return criterion
-    
+
     def vali(self, vali_data, vali_loader, criterion):
         if self.args.model == 'KNN':
             val_features, val_labels = vali_data.to_numpy()
@@ -119,6 +135,9 @@ class Exp_Classification():
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
 
+        train_losses = []
+        vali_losses = []
+
         if self.args.model == 'KNN':
             train_features, train_labels = train_data.to_numpy()
             self.model.fit(train_features.squeeze(), train_labels.squeeze())
@@ -161,7 +180,11 @@ class Exp_Classification():
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
+            train_losses.append(train_loss)
+
             vali_loss, val_accuracy = self.vali(vali_data, vali_loader, criterion)
+            vali_losses.append(vali_loss)
+
             test_loss, test_accuracy = self.vali(test_data, test_loader, criterion)
 
             print(
@@ -173,6 +196,19 @@ class Exp_Classification():
                 break
             if (epoch + 1) % 5 == 0:
                 adjust_learning_rate(model_optim, epoch + 1, self.args)
+        
+        plt.figure()
+        plt.plot(train_losses, label='Train Loss')
+        plt.plot(vali_losses, label='Validation Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title(f'Train and Validation Loss - {self.args.model}')
+        plt.legend()
+        plt.grid(True)
+        loss_plot_path = os.path.join(path, 'loss_plot.png')
+        plt.savefig(loss_plot_path)
+        plt.close()
+        print(f"Loss plot saved at {loss_plot_path}")
 
         best_model_path = path + '/' + 'checkpoint.pth'
         self.model.load_state_dict(torch.load(best_model_path))
