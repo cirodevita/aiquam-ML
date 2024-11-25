@@ -52,6 +52,6 @@ python-env-tools/**
 results/
 test_results/
 logs/
-checkpoints/
-plots/
+checkpoints*
+plots*
 venv/
