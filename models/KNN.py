@@ -4,7 +4,7 @@ import torch.nn as nn
 import numpy as np
 from scipy.spatial.distance import squareform
 from scipy.stats import mode
-from clang.cindex import xrange
+#from clang.cindex import xrange
 from numpy import shape
 from sklearn.neighbors import KNeighborsClassifier
 from skl2onnx import convert_sklearn
@@ -30,7 +30,7 @@ class Model(nn.Module):
     
     def save_model(self, path):
         initial_type = [('input', FloatTensorType([None, self.x.shape[1]]))]
-        onx = convert_sklearn(self.knn, initial_types=initial_type) 
+        onx = convert_sklearn(self.knn, initial_types=initial_type, target_opset=18)
 
         # onx = to_onnx(self.knn, self.x[:1])
         with open(f"{path}/model.onnx", "wb") as f:

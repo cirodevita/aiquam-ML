@@ -17,12 +17,12 @@ def majority_vote(predictions):
     return mode_label
 
 model_paths = [
-    './checkpoints/AIQUAM_CNN/model.onnx',
-    './checkpoints/AIQUAM_DLinear/model.onnx',
+    # './checkpoints/AIQUAM_CNN/model.onnx',
+    # './checkpoints/AIQUAM_DLinear/model.onnx',
     # './checkpoints/AIQUAM_Informer/model.onnx',
-    './checkpoints/AIQUAM_Reformer/model.onnx',
-    './checkpoints/AIQUAM_TimesNet/model.onnx',
-    './checkpoints/AIQUAM_Transformer/model.onnx',
+    # './checkpoints/AIQUAM_Reformer/model.onnx',
+    # './checkpoints/AIQUAM_TimesNet/model.onnx',
+    # './checkpoints/AIQUAM_Transformer/model.onnx',
     './checkpoints/AIQUAM_KNN/model.onnx'
 ]
 
