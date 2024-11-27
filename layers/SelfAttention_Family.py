@@ -92,7 +92,11 @@ class ProbAttention(nn.Module):
         # calculate the sampled Q_K
         K_expand = K.unsqueeze(-3).expand(B, H, L_Q, L_K, E)
         # real U = U_part(factor*ln(L_k))*L_q
-        index_sample = torch.randint(L_K, (L_Q, sample_k))
+        if torch.onnx.is_in_onnx_export():
+            # Use a fixed pattern for ONNX export
+            index_sample = torch.arange(sample_k).expand(L_Q, sample_k)
+        else:
+            index_sample = torch.randint(L_K, (L_Q, sample_k))
         K_sample = K_expand[:, :, torch.arange(
             L_Q).unsqueeze(1), index_sample, :]
         Q_K_sample = torch.matmul(
